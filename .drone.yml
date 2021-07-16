@@ -1,0 +1,32 @@
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+- name: build
+  image: digidvb/drone-kaniko
+  settings:
+    tarpath: image.tar
+    nopush: true
+    repo: digidvb/drone-crane
+  when:
+    event:
+    - tag
+
+- name: publish
+  image: digidvb/drone-crane
+  settings:
+    repo: digidvb/drone-crane
+    tarpath: image.tar
+    auto_tag: true
+    username:
+      from_secret: dockerhub_username
+    password:
+      from_secret: dockerhub_password
+  when:
+    event:
+    - tag
+
+trigger:
+  repo:
+  - digidvb/drone-crane
